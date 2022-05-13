@@ -80,6 +80,7 @@ int main() {
             break;
         case 3:
             printf("Round-Robin\n");
+            rrGetAvgTime(processes, processSize, arrivalTimes, burstTimes, timeSliceVal);
             break;
         default:
             printf("Invalid Algorithm\n");

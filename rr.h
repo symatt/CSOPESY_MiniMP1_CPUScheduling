@@ -1,71 +1,98 @@
 // Round Robin CPU Scheduling Algorithm
-// Template palang need to adjust pa to specs
-// https://www.javatpoint.com/round-robin-program-in-c
 #include<stdio.h>  
 #include<conio.h>  
-  
-// void main()  
-// {  
-//     // initlialize the variable name  
-//     int i, NOP, sum=0,count=0, y, quant, wt=0, tat=0, at[10], bt[10], temp[10];  
-//     float avg_wt, avg_tat;  
-//     printf(" Total number of process in the system: ");  
-//     scanf("%d", &NOP);  
-//     y = NOP; // Assign the number of process to variable y  
-  
-// // Use for loop to enter the details of the process like Arrival time and the Burst Time  
-// for(i=0; i<NOP; i++)  
-// {  
-// printf("\n Enter the Arrival and Burst time of the Process[%d]\n", i+1);  
-// printf(" Arrival time is: \t");  // Accept arrival time  
-// scanf("%d", &at[i]);  
-// printf(" \nBurst time is: \t"); // Accept the Burst time  
-// scanf("%d", &bt[i]);  
-// temp[i] = bt[i]; // store the burst time in temp array  
-// }  
-// // Accept the Time qunat  
-// printf("Enter the Time Quantum for the process: \t");  
-// scanf("%d", &quant);  
-// // Display the process No, burst time, Turn Around Time and the waiting time  
-// printf("\n Process No \t\t Burst Time \t\t TAT \t\t Waiting Time ");  
-// for(sum=0, i = 0; y!=0; )  
-// {  
-// if(temp[i] <= quant && temp[i] > 0) // define the conditions   
-// {  
-//     sum = sum + temp[i];  
-//     temp[i] = 0;  
-//     count=1;  
-//     }     
-//     else if(temp[i] > 0)  
-//     {  
-//         temp[i] = temp[i] - quant;  
-//         sum = sum + quant;    
-//     }  
-//     if(temp[i]==0 && count==1)  
-//     {  
-//         y--; //decrement the process no.  
-//         printf("\nProcess No[%d] \t\t %d\t\t\t\t %d\t\t\t %d", i+1, bt[i], sum-at[i], sum-at[i]-bt[i]);  
-//         wt = wt+sum-at[i]-bt[i];  
-//         tat = tat+sum-at[i];  
-//         count =0;     
-//     }  
-//     if(i==NOP-1)  
-//     {  
-//         i=0;  
-//     }  
-//     else if(at[i+1]<=sum)  
-//     {  
-//         i++;  
-//     }  
-//     else  
-//     {  
-//         i=0;  
-//     }  
-// }  
-// // represents the average waiting time and Turn Around time  
-// avg_wt = wt * 1.0/NOP;  
-// avg_tat = tat * 1.0/NOP;  
-// printf("\n Average Turn Around Time: \t%f", avg_wt);  
-// printf("\n Average Waiting Time: \t%f", avg_tat);  
-// getch();  
-// }  
+
+struct proc {
+    int process = 0;
+    int burstTime = 0;
+    int arrivalTime = 0;
+    int counter = 0;
+    int startTimes[20];
+    int endTimes[20];
+    int waitTime = 0;
+};
+
+int rrWaitingTime(int processes[], int n, int burstTimes[], int arrivalTimes[], int waitTimes[], int quant, struct proc[]) {
+    int index[n], fill = 0, i , j, k;
+    int count = 0;
+    int clear = 0;
+
+    for (i=0; i<n; i++) {
+        proc[i].process = prcesses[i];
+        proc[i].burstTime = bursTimes[i];
+        proc[i].arrivalTime = arrivalTimes[i];
+    }
+
+    while (clear != 1) {
+        clear = 0;
+        for (i=0; i<=fill; i++) {
+            for (j=0; j<n; j++) {
+                if (arrivalTimes[j] <= count) {
+                    for (k=0; k<fill; k++) {
+                        if (index[fill] != count) {
+                            index[fill] = j;
+                            fill++;
+                        }
+                    }
+                }
+            }
+
+            for (j=0; j<fill; j++) {
+                if (proc[index[j]].burstTime >= quant) {
+                    proc[index[j]].startTime[proc[index[j]].counter] = count;
+                    proc[index[j]].burstTime -= quant;
+                    count += quant;
+                    proc[index[j]].endTime[proc[index[j]].counter] = count;
+                    proc[index[j]].counter++;
+                    for (k=0; k<fill; k++) {
+                        if (proc[index[k]].process != proc[index[j]].process)
+                            proc[index[k]].waitTime += quant;
+                    }
+                }
+                elif (proc[index[j]].burstTime < quant && proc[index[j]].burstTime > 0) {
+                    proc[index[j]].startTime[proc[index[j]].counter] = count;
+                    count += proc[index[j]].burstTime;
+                    proc[index[j]].burstTime -= proc[index[j]].burstTime;
+                    proc[index[j]].endTime[proc[index[j]].counter] = count;
+                    proc[index[j]].counter++;
+                    for (k=0; k<fill; k++) {
+                        if (proc[index[k]].process != proc[index[j]].process)
+                            proc[index[k]].waitTime += proc[index[j]].burstTime;
+                    }
+                }
+            }
+
+        }
+
+        for (i=0; i<fill; i++) {
+            if (proc[index[i]].burstTime != 0)
+                clear = 0;
+                break;
+            else
+                clear = 1;
+        }
+
+        for (i=0; i<n; i++) {
+            if (arrivalTimes[i] > count) {
+                clear = 0;
+
+                break;
+            }
+        }
+
+    }
+    return 0;
+}
+
+int rrGetAvgTime(int processes[], int n, int arrivalTimes[], int burstTimes[], int quant) {
+    struct proc[n];
+    int waitTimes[n], total_wt = 0, total_tat = 0;
+    rrWaitingTime(processes, n, burstTimes, arrivalTimes, waitTimes, quant, proc);
+
+    for (int i=0; i<n; i++) {
+      total_wt = total_wt + wt[i];
+      printf("\t%d\t\t\t%d\t\t\t%d\n",i+1, bt[i], wt[i]);
+    }
+    printf("Average waiting time = %.1f", (float)total_wt / (float)n);
+    return 0;
+}
