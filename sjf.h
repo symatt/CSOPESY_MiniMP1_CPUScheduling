@@ -1,59 +1,43 @@
 // Shortest Job First CPU Scheduling Algorithm
-// Template palang need to adjust pa to specs
-// https://www.edureka.co/blog/sjf-scheduling-in-c/#:~:text=Shortest%20job%20first(SJF)%20is,round%2Drobin%20and%20FCFS%20Scheduling.
 #include<stdio.h>
- int main()
-{
-    int bt[20], p[20], n, wt[20], tat[20], i, j,  total=0, pos, temp;
-    float avg_wt, avg_tat;
-    printf("Enter number of process:");
-    scanf("%d",&n);
-  
-    printf("nEnter Burst Time:n");
-    for (i = 0; i < n; i++) {
-        printf("p%d:", i + 1);
-        scanf("%d", &bt[i]);
-        p[i] = i + 1;         
-    }
+int sjfGetAvgTime(int processes[], int processSize, int arrivalTimes[], int burstTimes[]) {
+    int waitTimes[processSize], i, j, total=0, pos, temp;
+    float avg_wt;
   
    //sorting of burst times
-    for (i = 0; i < n; i++) {
+    for (i = 0; i < processSize; i++) {
         pos = i;
-        for (j = i + 1; j < n; j++) {
-            if (bt[j] < bt[pos]) pos = j;
+        for (j = i + 1; j < processSize; j++) {
+            if (burstTimes[j] < burstTimes[pos]) 
+                pos = j;
         }
   
-        temp = bt[i];
-        bt[i] = bt[pos];
-        bt[pos] = temp;
+        temp = burstTimes[i];
+        burstTimes[i] = burstTimes[pos];
+        burstTimes[pos] = temp;
   
-        temp = p[i];
-        p[i] = p[pos];
-        p[pos] = temp;
+        temp = processes[i];
+        processes[i] = processes[pos];
+        processes[pos] = temp;
     }
    
-    wt[0] = 0;            
+    waitTimes[0] = 0;            
   
-   
-    for (i = 1; i < n; i++) {
-        wt[i] = 0;
+    for (i = 1; i < processSize; i++) {
+        waitTimes[i] = 0;
         for (j = 0; j < i; j++)
-            wt[i] += bt[j];
+            waitTimes[i] += burstTimes[j];
   
-        total += wt[i];
+        total += waitTimes[i];
     }
   
-    avg_wt = (float)total / n;      
-    total = 0;
-  
-    printf("\nProcess\t    Burst Time    \tWaiting Time\tTurnaround Time");
-    for (i = 0; i < n; i++) {
-        tat[i] = bt[i] + wt[i];   
-        total += tat[i];
-        printf("\np%d\t\t  %d\t\t    %d\t\t\t%d",p[i],bt[i],wt[i],tat[i]);
+    for (i = 0; i < processSize; i++) {
+        int startTime = arrivalTimes[i] + waitTimes[i];
+        int endTime = startTime + burstTimes[i];
+        printf("P[%d] Start Time: %d End Time: %d | Waiting Time: %d\n", processes[i], startTime, endTime, waitTimes[i]);
     }
-  
-    avg_tat = (float)total/n;    
-    printf("\n\nAverage Waiting Time=%f",avg_wt);
-    printf("\nAverage Turnaround Time=%f\n",avg_tat);
+
+    avg_wt = (float)total / processSize; 
+    printf("Average Waiting Time: %.1f",avg_wt);
+
 }

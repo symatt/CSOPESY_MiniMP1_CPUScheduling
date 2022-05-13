@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-#include "fcfs.h"
+// #include "fcfs.h"
 #include "sjf.h"
 #include "srtf.h"
 #include "rr.h"
@@ -12,8 +12,6 @@ int main() {
     FILE *fptr; 
 
     // get file name
-    printf("Get input here.\n");
-
     printf("File name: ");
     fgets(fileName, 30, stdin);
     fileName[strcspn(fileName, "\n")] = 0;
@@ -46,7 +44,7 @@ int main() {
     int info[processSize*3];
     fscanf (fptr, "%d", &i);   
     while (!feof (fptr)) {  
-        // printf ("%d ", i);
+        printf ("%d ", i);
         info[index] = i;
         index += 1;
         fscanf (fptr, "%d", &i);      
@@ -58,7 +56,7 @@ int main() {
     int burstTimes[processSize];
 
     index = 0;
-    for(i = 0; i < (processSize*3); i+=3) {
+    for(i = 0; i <= (processSize*3); i+=3) {
         processes[index] = info[i];
         arrivalTimes[index] = info[i+1];
         burstTimes[index] = info[i+2];
@@ -68,16 +66,14 @@ int main() {
     for (i = 0; i < processSize; i++) printf("\nProcess %d | Arrival Time: %d | Burst Time: %d\n", processes[i], arrivalTimes[i], burstTimes[i]);
     fclose(fptr);
 
-
-    printf("Execute CPU scheduling algorithm here.\n");
     switch(algorithm) {
         case 0:
             printf("First-Come First-Serve\n");
-            fcfsGetAvgTime(processes, processSize, burstTimes);
+            // fcfsGetAvgTime(processes, processSize, arrivalTimes, burstTimes);
             break;
         case 1:
             printf("Shortest-Job First\n");
-            // sjfGetAvgTime(processes, processSize, burstTimes);
+            sjfGetAvgTime(processes, processSize, arrivalTimes, burstTimes);
             break;
         case 2:
             printf("Shortest-Remaining-Time-First\n");
@@ -89,8 +85,6 @@ int main() {
             printf("Invalid Algorithm\n");
             break;
     }
-    
-    printf("Show ouput here.\n");
     
     return 0;
 }
