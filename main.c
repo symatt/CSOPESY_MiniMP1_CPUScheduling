@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-// #include "fcfs.h"
+#include "fcfs.h"
 #include "sjf.h"
 #include "srtf.h"
 #include "rr.h"
@@ -69,7 +69,7 @@ int main() {
     switch(algorithm) {
         case 0:
             printf("First-Come First-Serve\n");
-            // fcfsGetAvgTime(processes, processSize, arrivalTimes, burstTimes);
+            fcfsGetAvgTime(processes, processSize, burstTimes);
             break;
         case 1:
             printf("Shortest-Job First\n");

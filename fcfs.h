@@ -15,7 +15,6 @@ int procTime(int proc[], int n, int burst_time[], int start_time[], int end_time
         start_time[i] = end_time[i-1];
         end_time[i] = start_time[i] + burst_time[i];
     }
-    
     return 0;
 }
 
@@ -24,7 +23,7 @@ int fcfsGetAvgTime(int proc[], int n, int burst_time[]) {
     int i;
 
     waitingTime(proc, n, burst_time, wait_time);
-    printf("Processes  Burst   Waiting  Turn around \n");
+    procTime(proc, n, burst_time, start_time, end_time);
 
     for (i = 0; i < n; i++) {
         total_wt = total_wt + wait_time[i];
