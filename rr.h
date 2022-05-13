@@ -3,21 +3,24 @@
 #include<conio.h>  
 
 struct proc {
-    int process = 0;
-    int burstTime = 0;
-    int arrivalTime = 0;
-    int counter = 0;
+    int process;
+    int burstTime;
+    int arrivalTime;
+    int counter;
     int startTimes[20];
     int endTimes[20];
-    int waitTime = 0;
+    int waitTime;
 };
 
-int rrWaitingTime(int processes[], int n, int burstTimes[], int arrivalTimes[], int waitTimes[], int quant, struct proc[]) {
-    int index[n], fill = 0, i , j, k;
+int rrWaitingTime(int processes[], int n, int burstTimes[], int arrivalTimes[], int waitTimes[], int quant, struct proc[], int index[]) {
+    int fill = 0, i , j, k;
     int count = 0;
     int clear = 0;
 
     for (i=0; i<n; i++) {
+        proc[i].process = 0;
+        proc[i].burstTime = 0;
+        proc[i].arrivalTime = 0;
         proc[i].process = prcesses[i];
         proc[i].burstTime = bursTimes[i];
         proc[i].arrivalTime = arrivalTimes[i];
@@ -86,12 +89,17 @@ int rrWaitingTime(int processes[], int n, int burstTimes[], int arrivalTimes[], 
 
 int rrGetAvgTime(int processes[], int n, int arrivalTimes[], int burstTimes[], int quant) {
     struct proc[n];
-    int waitTimes[n], total_wt = 0, total_tat = 0;
-    rrWaitingTime(processes, n, burstTimes, arrivalTimes, waitTimes, quant, proc);
+    int index[n];
+    int waitTimes[n], total_wt = 0, total_tat = 0, i, j;
+    rrWaitingTime(processes, n, burstTimes, arrivalTimes, waitTimes, quant, proc, index);
 
-    for (int i=0; i<n; i++) {
-      total_wt = total_wt + wt[i];
-      printf("\t%d\t\t\t%d\t\t\t%d\n",i+1, bt[i], wt[i]);
+    for (i=0; i<n; i++) {
+      total_wt = total_wt + proc[index[i]].waitTime;
+      printf("P[%d] ", proc[index[i]].process);
+      for (j=0; j<proc[index[i]].counter; j++) {
+          printf("Start Time: %d  End Time: %d  |  ", proc[index[i]].startTime[j], proc[index[i]].endTime[j]);
+      }
+      printf("Wait Time: %d\n", proc[index[i]].waitTime);
     }
     printf("Average waiting time = %.1f", (float)total_wt / (float)n);
     return 0;
