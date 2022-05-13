@@ -15,7 +15,7 @@ struct Proc {
 int rrWaitingTime(int processes[], int n, int burstTimes[], int arrivalTimes[], int waitTimes[], int quant, struct Proc proc[], int fin[]) {
     int fill = 0, i, j, k;
     int count = 0, fincount = 0;
-    int clear = 0;
+    int clear = 0, in = 0;
     int index[n];
 
     for (i=0; i<n; i++) {
@@ -30,15 +30,19 @@ int rrWaitingTime(int processes[], int n, int burstTimes[], int arrivalTimes[], 
     }
 
     while (clear != 1) {
-        clear = 0;
         for (i=0; i<n; i++) {
             if (arrivalTimes[i] <= count) {
                 for (j=0; j<fill; j++) {
-                    if (index[fill] != count) {
-                        index[fill] = i;
-                        fill++;
+                    if (index[j] == i) {
+                        in = 1;
+                        break;
                     }
                 }
+                if (in == 0) {
+                    index[fill] = i;
+                    fill++;
+                }
+                in = 0;
             }
         }
 
