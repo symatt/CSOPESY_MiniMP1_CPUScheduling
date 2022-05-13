@@ -4,8 +4,8 @@
 
 struct ProcessInfo {
     int ctr;
-    int startTimes[20];
-    int endTimes[20];
+    int startTimes[100];
+    int endTimes[100];
 };
 
 int srtfGetAvgTime(int processes[], int processSize, int arrivalTimes[], int burstTimes[]) {
@@ -83,7 +83,7 @@ int srtfGetAvgTime(int processes[], int processSize, int arrivalTimes[], int bur
         if(remainingTimes[smallest] == 0) {
             remain++;
             endTime = time + 1;
-            printf("\ntime P[%d] ", smallest + 1);
+            printf("\nP[%d] ", smallest + 1);
             for (i = 0; i < 20; i++) {
                 if (info[smallest].startTimes[i] == -1 && info[smallest].endTimes[i] == -1) {
                     break;
