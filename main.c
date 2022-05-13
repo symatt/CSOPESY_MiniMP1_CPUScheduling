@@ -6,15 +6,6 @@
 #include "srtf.h"
 #include "rr.h"
 
-struct processInfo {
-    int processNum;
-    int arrivalTime;
-    int burstTime;
-    int waitTime;
-    int startTime;
-    int endTime;
-};
-
 int main() {
 
     char fileName[30];
@@ -61,22 +52,44 @@ int main() {
         fscanf (fptr, "%d", &i);      
     }
     
-    // turn into a struct for easier processing later
-    struct processInfo processes[processSize];
+    // separate information into different arrays
+    int processes[processSize];
+    int arrivalTimes[processSize];
+    int burstTimes[processSize];
 
     index = 0;
     for(i = 0; i < (processSize*3); i+=3) {
-        processes[index].processNum = info[i];
-        processes[index].arrivalTime = info[i];
-        processes[index].burstTime = info[i];
+        processes[index] = info[i];
+        arrivalTimes[index] = info[i+1];
+        burstTimes[index] = info[i+2];
         index += 1;
     }
 
-    for (i = 0; i < processSize; i++) printf("\nProcess %d | Arrival Time: %d | Burst Time: %d\n", processes[i].processNum, processes[i].arrivalTime, processes[i].burstTime);
+    for (i = 0; i < processSize; i++) printf("\nProcess %d | Arrival Time: %d | Burst Time: %d\n", processes[i], arrivalTimes[i], burstTimes[i]);
     fclose(fptr);
 
 
     printf("Execute CPU scheduling algorithm here.\n");
+    switch(algorithm) {
+        case 0:
+            printf("First-Come First-Serve\n");
+            fcfsGetAvgTime(processes, processSize, burstTimes);
+            break;
+        case 1:
+            printf("Shortest-Job First\n");
+            // sjfGetAvgTime(processes, processSize, burstTimes);
+            break;
+        case 2:
+            printf("Shortest-Remaining-Time-First\n");
+            break;
+        case 3:
+            printf("Round-Robin\n");
+            break;
+        default:
+            printf("Invalid Algorithm\n");
+            break;
+    }
+    
     printf("Show ouput here.\n");
     
     return 0;
