@@ -22,9 +22,11 @@ int rrWaitingTime(int processes[], int n, int burstTimes[], int arrivalTimes[], 
         proc[i].process = 0;
         proc[i].burstTime = 0;
         proc[i].arrivalTime = 0;
+        proc[i].counter = 0
         proc[i].process = processes[i];
         proc[i].burstTime = burstTimes[i];
         proc[i].arrivalTime = arrivalTimes[i];
+        proc[i].waitTime = 0;
     }
 
     while (clear != 1) {
