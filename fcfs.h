@@ -1,57 +1,36 @@
 // First Come First Serve CPU Scheduling Algorithm
-// Template palang need to adjust pa to specs
-// https://www.tutorialspoint.com/c-program-for-fcfs-scheduling
 #include <stdio.h>
 
-// Function to find the waiting time for all processes
-int waitingtime(int proc[], int n, int burst_time[], int wait_time[]) {
-    // waiting time for first process is 0
+int waitingTime(int proc[], int n, int burst_time[], int wait_time[]) {
     wait_time[0] = 0;
-    // calculating waiting time
-    for (int i = 1; i < n ; i++ )
+    for (int i = 1; i < n; i++ )
         wait_time[i] = burst_time[i-1] + wait_time[i-1];
     return 0;
 }
 
-// Function to calculate turn around time
-int turnaroundtime(int proc[], int n,int burst_time[], int wait_time[], int tat[]) {
-    // calculating turnaround time by adding
-    // burst_time[i] + wait_time[i]
-    int i;
-    for (i = 0; i < n ; i++)
-        tat[i] = burst_time[i] + wait_time[i];
+int procTime(int proc[], int n, int burst_time[], int start_time[], int end_time[]) {
+    start_time[0] = 0;
+    end_time[0] = start_time[0] + burst_time[0];
+    for (int i = 1; i < n; i++ ) {
+        start_time[i] = end_time[i-1];
+        end_time[i] = start_time[i] + burst_time[i];
+    }
+    
     return 0;
 }
 
-//Function to calculate average time
 int fcfsGetAvgTime(int proc[], int n, int burst_time[]) {
-    int wait_time[n], tat[n], total_wt = 0, total_tat = 0;
+    int wait_time[n], start_time[n], end_time[n], total_wt = 0;
     int i;
-    //Function to find waiting time of all processes
-    waitingtime(proc, n, burst_time, wait_time);
-    //Function to find turn around time for all processes
-    turnaroundtime(proc, n, burst_time, wait_time, tat);
-    //Display processes along with all details
+
+    waitingTime(proc, n, burst_time, wait_time);
     printf("Processes  Burst   Waiting  Turn around \n");
-    // Calculate total waiting time and total turn
-    // around time
+
     for (i = 0; i < n; i++) {
         total_wt = total_wt + wait_time[i];
-        total_tat = total_tat + tat[i];
-        printf(" %d\t  %d\t\t %d \t%d\n", i, burst_time[i], wait_time[i], tat[i]);
+        printf("P[%d]  Start Time:  %d  End Time:  %d  |  Waiting Time: %d\n", i, start_time[i], end_time[i], wait_time[i]);
     }
-    printf("Average waiting time = %f\n", (float)total_wt / (float)n);
-    printf("Average turn around time = %f\n", (float)total_tat / (float)n);
+
+    printf("Average waiting time = %.1f\n", (float)total_wt / (float)n);
     return 0;
 }
-
-// main function
-// int main() {
-//    //process id's
-//    int proc[] = { 1, 2, 3};
-//    int n = sizeof proc / sizeof proc[0];
-//    //Burst time of all processes
-//    int burst_time[] = {5, 8, 12};
-//    avgtime(proc, n, burst_time);
-//    return 0;
-// }
