@@ -77,6 +77,7 @@ int main() {
             break;
         case 2:
             printf("Shortest-Remaining-Time-First\n");
+            srtfGetAvgTime(processes, processSize, arrivalTimes, burstTimes);
             break;
         case 3:
             printf("Round-Robin\n");

@@ -2,64 +2,72 @@
 // Template palang need to adjust pa to specs
 // https://www.edureka.co/blog/sjf-scheduling-in-c/
 #include<stdio.h>
-//  int main()
-// {
-//     int bt[20],p[20],wt[20],tat[20],i,j,n,total=0,pos,temp;
-//     float avg_wt,avg_tat;
-//     printf("Enter number of process:");
-//     scanf("%d",&n);
+int srtfGetAvgTime(int processes[], int processSize, int arrivalTimes[], int burstTimes[]) {
+    int remainingTimes[processSize + 1], endTime, i, j, pos, smallest, temp;
+
+    int remain = 0, n, time, sum_wait = 0, sum_turnaround = 0;
+
+    for (i = 0; i < processSize; i++) {
+        pos = i;
+        for (j = i + 1; j < processSize; j++) {
+            if (arrivalTimes[j] < arrivalTimes[pos]) 
+                pos = j;
+        }
+
+        temp = arrivalTimes[i];
+        arrivalTimes[i] = arrivalTimes[pos];
+        arrivalTimes[pos] = temp;
   
-//     printf("nEnter Burst Time:n");
-//     for(i=0;i<n;i++)
-//     {
-//         printf("p%d:",i+1);
-//         scanf("%d",&bt[i]);
-//         p[i]=i+1;         
-//     }
+        temp = burstTimes[i];
+        burstTimes[i] = burstTimes[pos];
+        burstTimes[pos] = temp;
   
-//    //sorting of burst times
-//     for(i=0;i<n;i++)
-//     {
-//         pos=i;
-//         for(j=i+1;j<n;j++)
-//         {
-//             if(bt[j]<bt[pos])
-//                 pos=j;
-//         }
-  
-//         temp=bt[i];
-//         bt[i]=bt[pos];
-//         bt[pos]=temp;
-  
-//         temp=p[i];
-//         p[i]=p[pos];
-//         p[pos]=temp;
-//     }
-   
-//     wt[0]=0;            
-  
-   
-//     for(i=1;i<n;i++)
-//     {
-//         wt[i]=0;
-//         for(j=0;j<i;j++)
-//             wt[i]+=bt[j];
-  
-//         total+=wt[i];
-//     }
-  
-//     avg_wt=(float)total/n;      
-//     total=0;
-  
-//     printf("nProcesst    Burst Time    tWaiting TimetTurnaround Time");
-//     for(i=0;i<n;i++)
-//     {
-//         tat[i]=bt[i]+wt[i];   
-//         total+=tat[i];
-//         printf("np%dtt  %dtt    %dttt%d",p[i],bt[i],wt[i],tat[i]);
-//     }
-  
-//     avg_tat=(float)total/n;    
-//     printf("nnAverage Waiting Time=%f",avg_wt);
-//     printf("nAverage Turnaround Time=%fn",avg_tat);
-// }
+        temp = processes[i];
+        processes[i] = processes[pos];
+        processes[pos] = temp;
+
+        remainingTimes[i] = burstTimes[i];
+    }
+
+    printf("\n\nProcess\t|Turnaround Time| Waiting Time\n\n");
+    for (i = 0; i < processSize; i++) {
+        printf("P[%d] | Burst Time: %d | Arrival Time: %d\n", processes[i], burstTimes[i], arrivalTimes[i]);
+    }
+    
+    smallest = 0;
+    for(time = 0; remain != processSize; time++) {
+        for(i = 0; i < processSize; i++) {
+            if(arrivalTimes[i] <= time && 
+                remainingTimes[i] < remainingTimes[smallest] && 
+                remainingTimes[i] > 0) {
+                // endTime = time + 1;
+                // printf("\nP[%d] Start Time: End Time: %d | Waiting Time: %d", smallest + 1, endTime, endTime-burstTimes[smallest]-arrivalTimes[smallest]);
+                temp = i;
+                
+                printf("%d =? %d ", smallest + 1, temp + 1);
+                // if (smallest != processSize && smallest != temp) {
+                    endTime = time + 1;
+                    printf("P[%d] Start Time: End Time: %d | Waiting Time: %d\n", smallest + 1, endTime, endTime-burstTimes[smallest]-arrivalTimes[smallest]);
+                // }
+                smallest = i;
+            }
+        }
+        printf("\n");
+        remainingTimes[smallest]--;
+        if(remainingTimes[smallest] == 0) {
+            remain++;
+            endTime = time + 1;
+            printf("\n0 rem time P[%d] Start Time: End Time: %d | Waiting Time: %d\n", smallest + 1, endTime, endTime-burstTimes[smallest]-arrivalTimes[smallest]);
+            sum_wait += endTime-burstTimes[smallest]-arrivalTimes[smallest];
+        }
+        // else {
+        //     endTime = time + 1;
+        //     printf("\nP[%d] Start Time: End Time: %d | Waiting Time: %d", smallest + 1, endTime, endTime-burstTimes[smallest]-arrivalTimes[smallest]);
+        // }
+    }
+
+    printf("\n\nAverage waiting time = %.1f\n", (float)sum_wait / processSize);
+
+
+    return 0;
+}
