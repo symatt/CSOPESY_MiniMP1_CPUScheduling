@@ -1,7 +1,7 @@
 // Shortest Job First CPU Scheduling Algorithm
 #include<stdio.h>
 int sjfGetAvgTime(int processes[], int processSize, int arrivalTimes[], int burstTimes[]) {
-    int waitTimes[processSize], i, j, total=0, pos, temp;
+    int waitTimes[processSize], i, j, total = 0, pos, temp;
     float avg_wt;
   
    //sorting of burst times
