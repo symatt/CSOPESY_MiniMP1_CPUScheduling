@@ -2,18 +2,18 @@
 #include<stdio.h>  
 #include<conio.h>  
 
-struct proc {
+struct Proc {
     int process;
     int burstTime;
     int arrivalTime;
     int counter;
-    int startTimes[20];
-    int endTimes[20];
+    int startTime[20];
+    int endTime[20];
     int waitTime;
 };
 
-int rrWaitingTime(int processes[], int n, int burstTimes[], int arrivalTimes[], int waitTimes[], int quant, struct proc[], int index[]) {
-    int fill = 0, i , j, k;
+int rrWaitingTime(int processes[], int n, int burstTimes[], int arrivalTimes[], int waitTimes[], int quant, struct Proc proc[], int index[]) {
+    int fill = 0, i, j, k;
     int count = 0;
     int clear = 0;
 
@@ -21,8 +21,8 @@ int rrWaitingTime(int processes[], int n, int burstTimes[], int arrivalTimes[], 
         proc[i].process = 0;
         proc[i].burstTime = 0;
         proc[i].arrivalTime = 0;
-        proc[i].process = prcesses[i];
-        proc[i].burstTime = bursTimes[i];
+        proc[i].process = processes[i];
+        proc[i].burstTime = burstTimes[i];
         proc[i].arrivalTime = arrivalTimes[i];
     }
 
@@ -52,7 +52,7 @@ int rrWaitingTime(int processes[], int n, int burstTimes[], int arrivalTimes[], 
                             proc[index[k]].waitTime += quant;
                     }
                 }
-                elif (proc[index[j]].burstTime < quant && proc[index[j]].burstTime > 0) {
+                else if (proc[index[j]].burstTime < quant && proc[index[j]].burstTime > 0) {
                     proc[index[j]].startTime[proc[index[j]].counter] = count;
                     count += proc[index[j]].burstTime;
                     proc[index[j]].burstTime -= proc[index[j]].burstTime;
@@ -66,33 +66,25 @@ int rrWaitingTime(int processes[], int n, int burstTimes[], int arrivalTimes[], 
             }
 
         }
-
+        // printf("NICE\n");
         for (i=0; i<fill; i++) {
-            if (proc[index[i]].burstTime != 0)
+            if (proc[index[i]].burstTime != 0) {
                 clear = 0;
                 break;
+            }
             else
                 clear = 1;
         }
-
-        for (i=0; i<n; i++) {
-            if (arrivalTimes[i] > count) {
-                clear = 0;
-
-                break;
-            }
-        }
-
     }
     return 0;
 }
 
 int rrGetAvgTime(int processes[], int n, int arrivalTimes[], int burstTimes[], int quant) {
-    struct proc[n];
+    struct Proc proc[n];
     int index[n];
     int waitTimes[n], total_wt = 0, total_tat = 0, i, j;
     rrWaitingTime(processes, n, burstTimes, arrivalTimes, waitTimes, quant, proc, index);
-
+    
     for (i=0; i<n; i++) {
       total_wt = total_wt + proc[index[i]].waitTime;
       printf("P[%d] ", proc[index[i]].process);
