@@ -74,7 +74,6 @@ int rrWaitingTime(int processes[], int n, int burstTimes[], int arrivalTimes[], 
                         }
                         if (in == 0) {
                             index[fill] = j;
-                            proc[index[fill]].waitTime += count - arrivalTimes[j];
                             fill++;
                         }
                         in = 0;
@@ -119,7 +118,6 @@ int rrWaitingTime(int processes[], int n, int burstTimes[], int arrivalTimes[], 
                         }
                         if (in == 0) {
                             index[fill] = j;
-                            proc[index[fill]].waitTime += count - arrivalTimes[j];
                             fill++;
                         }
                         in = 0;
