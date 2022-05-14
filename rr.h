@@ -13,10 +13,11 @@ struct Proc {
 };
 
 int rrWaitingTime(int processes[], int n, int burstTimes[], int arrivalTimes[], int waitTimes[], int quant, struct Proc proc[], int fin[]) {
-    int fill = 0, i, j, k;
-    int count = 0, fincount = 0;
-    int clear = 0, in = 0;
+    int fill = 0, i, j, k, l;
+    int count = 0, fincount = 0, qcount = 0;
+    int clear = 0, in = 0, qin = 0, inc = 0;
     int index[n];
+    int queue[20000];
 
     for (i=0; i<n; i++) {
         proc[i].counter = 0;
@@ -40,43 +41,117 @@ int rrWaitingTime(int processes[], int n, int burstTimes[], int arrivalTimes[], 
                     fill++;
                 }
                 in = 0;
+                if (proc[index[i]].burstTime != 0) {
+                    queue[qcount] = i;
+                    qcount++;
+                }
             }
         }
 
-        for (i=0; i<fill; i++) {
-            if (proc[index[i]].burstTime >= quant) {
-                proc[index[i]].startTime[proc[index[i]].counter] = count;
-                proc[index[i]].burstTime -= quant;
+        for (i=0; i<qcount; i++) {
+            if (proc[queue[i]].burstTime >= quant) {
+                proc[queue[i]].startTime[proc[queue[i]].counter] = count;
+                proc[queue[i]].burstTime -= quant;
                 count += quant;
-                proc[index[i]].endTime[proc[index[i]].counter] = count;
-                proc[index[i]].counter++;
+                proc[queue[i]].endTime[proc[queue[i]].counter] = count;
+                proc[queue[i]].counter++;
                 for (j=0; j<fill; j++) {
-                    if (proc[index[j]].process != proc[index[i]].process)
+                    if (proc[index[j]].process != proc[queue[i]].process)
                         if (proc[index[j]].burstTime != 0)
                             proc[index[j]].waitTime += quant;
                 }
-                if (proc[index[i]].burstTime == 0) {
-                    fin[fincount] = index[i];
+                if (proc[queue[i]].burstTime == 0) {
+                    fin[fincount] = queue[i];
                     fincount++;
+                }
+                for (j=0; j<n; j++) {
+                    if (arrivalTimes[j] <= count) {
+                        for (k=0; k<fill; k++) {
+                            if (index[k] == j) {
+                                in = 1;
+                                break;
+                            }
+                        }
+                        if (in == 0) {
+                            index[fill] = j;
+                            fill++;
+                        }
+                        in = 0;
+                        if (proc[index[j]].burstTime != 0) {
+                            for (l=i; l<qcount; l++) {
+                                if (proc[queue[l]].process == proc[index[j]].process) {
+                                    qin = 1;
+                                    break;
+                                }
+                            }
+                            if (qin == 0) {
+                                queue[qcount] = j;
+                                qcount++;
+                            }
+                        }
+                        qin = 0;
+                    }
                 }
             }
-            else if (proc[index[i]].burstTime < quant && proc[index[i]].burstTime > 0) {
-                proc[index[i]].startTime[proc[index[i]].counter] = count;
-                count += proc[index[i]].burstTime;
-                proc[index[i]].burstTime -= proc[index[i]].burstTime;
-                proc[index[i]].endTime[proc[index[i]].counter] = count;
-                proc[index[i]].counter++;
+            else if (proc[queue[i]].burstTime < quant && proc[queue[i]].burstTime > 0) {
+                proc[queue[i]].startTime[proc[queue[i]].counter] = count;
+                count += proc[queue[i]].burstTime;
+                proc[queue[i]].endTime[proc[queue[i]].counter] = count;
+                proc[queue[i]].counter++;
                 for (j=0; j<fill; j++) {
-                    if (proc[index[j]].process != proc[index[i]].process)
+                    if (proc[index[j]].process != proc[queue[i]].process)
                         if (proc[index[j]].burstTime != 0)
-                            proc[index[j]].waitTime += proc[index[i]].burstTime;
+                            proc[index[j]].waitTime += proc[queue[i]].burstTime;
                 }
-                if (proc[index[i]].burstTime == 0) {
-                    fin[fincount] = index[i];
+                proc[queue[i]].burstTime -= proc[queue[i]].burstTime;
+                if (proc[queue[i]].burstTime == 0) {
+                    fin[fincount] = queue[i];
                     fincount++;
+                }
+                for (j=0; j<n; j++) {
+                    if (arrivalTimes[j] <= count) {
+                        for (k=0; k<fill; k++) {
+                            if (index[k] == j) {
+                                in = 1;
+                                break;
+                            }
+                        }
+                        if (in == 0) {
+                            index[fill] = j;
+                            fill++;
+                        }
+                        in = 0;
+                        if (proc[index[j]].burstTime != 0) {
+                            for (l=i; l<qcount; l++) {
+                                if (proc[queue[l]].process == proc[index[j]].process) {
+                                    qin = 1;
+                                    break;
+                                }
+                            }
+                            if (qin == 0) {
+                                queue[qcount] = j;
+                                qcount++;
+                            }
+                        }
+                        qin = 0;
+                    }
                 }
             }
         }
+        if (fincount != n) {
+            for (i=0; i<fill; i++) {
+                if (proc[index[i]].burstTime == 0) {
+                    inc = 1;
+                }
+                else {
+                    inc = 0;
+                    break;
+                }
+            }
+        }
+
+        if (inc == 1)
+            count++;
 
         if (fill == fincount) {
             clear = 1;
