@@ -33,7 +33,7 @@ int main() {
     int algorithm;
     int timeSliceVal;
 
-    int i;
+    int a, i;
     int index = 0;
     
     // get values for type of algorithm, how many processes, and time slice value
@@ -41,14 +41,14 @@ int main() {
     // printf("algorithm: %d, processSize: %d, timeSliceValue: %d\n", algorithm, processSize, timeSliceVal);
 
     // get the information per process
-    int info[processSize*3];
-    fscanf (fptr, "%d", &i);   
-    while (!feof (fptr)) {  
-        // printf ("%d ", i);
-        info[index] = i;
-        index += 1;
-        fscanf (fptr, "%d", &i);      
-    }
+    // int info[processSize*3];
+    // fscanf (fptr, "%d", &a);   
+    // while (!feof (fptr)) {  
+    //     // printf ("%d ", i);
+    //     info[index] = a;
+    //     index += 1;
+    //     fscanf (fptr, "%d", &a);      
+    // }
     
     // separate information into different arrays
     int processes[processSize];
@@ -57,9 +57,7 @@ int main() {
 
     index = 0;
     for(i = 0; i <= (processSize*3); i+=3) {
-        processes[index] = info[i];
-        arrivalTimes[index] = info[i+1];
-        burstTimes[index] = info[i+2];
+        fscanf(fptr, "%d %d %d", &(processes[index]), &(arrivalTimes[index]), &(burstTimes[index]));
         index += 1;
     }
 

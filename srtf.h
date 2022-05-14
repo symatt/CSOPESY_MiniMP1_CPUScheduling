@@ -17,7 +17,7 @@ int srtfGetAvgTime(int processes[], int processSize, int arrivalTimes[], int bur
     for (i = 0; i < processSize; i++) {
         pos = i;
         for (j = i + 1; j < processSize; j++) {
-            if (arrivalTimes[j] < arrivalTimes[pos]) 
+            if (arrivalTimes[j] <= arrivalTimes[pos]) 
                 pos = j;
         }
 
@@ -34,6 +34,7 @@ int srtfGetAvgTime(int processes[], int processSize, int arrivalTimes[], int bur
         processes[pos] = temp;
 
         remainingTimes[i] = burstTimes[i];
+
         info[i].ctr = 0;
         for (j = 0; j < 100; j++) {
             info[i].startTimes[j] = -1;
@@ -41,7 +42,6 @@ int srtfGetAvgTime(int processes[], int processSize, int arrivalTimes[], int bur
         }
     }
 
-    // printf("\n\nProcess\t|Turnaround Time| Waiting Time\n\n");
     // for (i = 0; i < processSize; i++) {
     //     printf("P[%d] | Burst Time: %d | Arrival Time: %d\n", processes[i], burstTimes[i], arrivalTimes[i]);
     // }
@@ -54,7 +54,9 @@ int srtfGetAvgTime(int processes[], int processSize, int arrivalTimes[], int bur
     // loop while there are still processes needed to be executed
     // start from time = 0
     for(time = 0; remain != processSize; time++) {
+        // printf("CURRENT TIME : %d\n", time);
         // compare if the smallest remaining time process is still the smallest
+        // printf("Current smallest: P[%d] burst time: %d arrival time: %d remaining time: %d\n", processes[smallest], burstTimes[smallest], arrivalTimes[smallest], remainingTimes[smallest]);
         for(i = 0; i < processSize; i++) {
             // if not the smallest, make the end time to be the current time and 
             // check if the start != end time ( this means that there are a preemption )
@@ -65,25 +67,34 @@ int srtfGetAvgTime(int processes[], int processSize, int arrivalTimes[], int bur
                 remainingTimes[i] > 0) {
                 
                 // printf("%d =? %d ", smallest + 1, temp + 1);
-                    endTime = time;
-                    if (startTime != endTime) {
-                        info[smallest].startTimes[info[smallest].ctr] = startTime;
-                        info[smallest].endTimes[info[smallest].ctr] = endTime;
-                        // printf("P[%d] Start Time: %d End Time: %d | Waiting Time: %d\n", smallest + 1, startTime, endTime, endTime-burstTimes[smallest]-arrivalTimes[smallest]);
-                        startTime = endTime;
-                    }
+                endTime = time;
+                if (startTime != endTime) {
+                    info[smallest].startTimes[info[smallest].ctr] = startTime;
+                    info[smallest].endTimes[info[smallest].ctr] = endTime;
+                    // printf("P[%d] Start Time: %d End Time: %d | Waiting Time: %d\n", smallest + 1, startTime, endTime, endTime-burstTimes[smallest]-arrivalTimes[smallest]);
+                    startTime = endTime;
+                }
                 smallest = i;
+                
             }
         }
         // printf("\n");
+        
+        
+        if (arrivalTimes[smallest] <= time) {
+            remainingTimes[smallest]--;
+        }
+        else {
+            startTime += 1;
+        }
 
-        remainingTimes[smallest]--;
+        // printf("NEW smallest: P[%d] burst time: %d arrival time: %d remaining time: %d\n", processes[smallest], burstTimes[smallest], arrivalTimes[smallest], remainingTimes[smallest]);
 
         // process is finished
         if(remainingTimes[smallest] == 0) {
             remain++;
             endTime = time + 1;
-            printf("\nP[%d] ", smallest + 1);
+            printf("\nP[%d] ", processes[smallest]);
             for (i = 0; i < 20; i++) {
                 if (info[smallest].startTimes[i] == -1 && info[smallest].endTimes[i] == -1) {
                     break;
@@ -95,7 +106,7 @@ int srtfGetAvgTime(int processes[], int processSize, int arrivalTimes[], int bur
             sum_wait += (endTime - burstTimes[smallest] - arrivalTimes[smallest]);
             
             // make the remaining time a large number to not intefere with the remaining times
-            remainingTimes[smallest] = 9999;
+            remainingTimes[smallest] = 99999;
             // make the new start time the end time of the finished process
             startTime = endTime;
         }
@@ -106,3 +117,16 @@ int srtfGetAvgTime(int processes[], int processSize, int arrivalTimes[], int bur
 
     return 0;
 }
+
+/* 
+1 1
+5 5
+3 2
+4 4
+2 3
+6 6
+9 9
+8 8
+10 10
+7 7
+*/
