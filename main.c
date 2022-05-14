@@ -67,7 +67,7 @@ int main() {
     switch(algorithm) {
         case 0:
             printf("First-Come First-Serve\n");
-            fcfsGetAvgTime(processes, processSize, burstTimes);
+            fcfsGetAvgTime(processes, processSize, arrivalTimes, burstTimes);
             break;
         case 1:
             printf("Shortest-Job First\n");
