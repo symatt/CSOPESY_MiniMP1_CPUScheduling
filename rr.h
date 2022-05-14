@@ -27,8 +27,6 @@ int rrWaitingTime(int processes[], int n, int burstTimes[], int arrivalTimes[], 
     }
 
     while (clear != 1) {
-        printf("%d\n", fill);
-        printf("%d\n", count);
         for (i=0; i<n; i++) {
             if (arrivalTimes[i] <= count) {
                 for (j=0; j<fill; j++) {

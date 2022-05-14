@@ -35,7 +35,7 @@ int srtfGetAvgTime(int processes[], int processSize, int arrivalTimes[], int bur
 
         remainingTimes[i] = burstTimes[i];
         info[i].ctr = 0;
-        for (j = 0; j < 20; j++) {
+        for (j = 0; j < 100; j++) {
             info[i].startTimes[j] = -1;
             info[i].endTimes[j] = -1;
         }
