@@ -117,16 +117,3 @@ int srtfGetAvgTime(int processes[], int processSize, int arrivalTimes[], int bur
 
     return 0;
 }
-
-/* 
-1 1
-5 5
-3 2
-4 4
-2 3
-6 6
-9 9
-8 8
-10 10
-7 7
-*/

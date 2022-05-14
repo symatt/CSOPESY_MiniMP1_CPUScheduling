@@ -13,9 +13,9 @@ struct Proc {
 };
 
 int rrWaitingTime(int processes[], int n, int burstTimes[], int arrivalTimes[], int waitTimes[], int quant, struct Proc proc[], int fin[]) {
-    int fill = 0, i, j, k, l;
-    int count = 0, fincount = 0, qcount = 0;
-    int clear = 0, in = 0, qin = 0, inc = 0;
+    int fill = 0, i, j, k, l, pos, temp;
+    int count = 0, fincount = 0, qcount = 0, qpointer = 0;
+    int clear = 0, in = 0, qin = 0, inc = 1;
     int index[n];
     int queue[20000];
 
@@ -27,28 +27,73 @@ int rrWaitingTime(int processes[], int n, int burstTimes[], int arrivalTimes[], 
         proc[i].waitTime = 0;
     }
 
+    //  for (i = 0; i < n; i++) {
+    //     pos = i;
+    //     for (j = i + 1; j < n; j++) {
+    //         if (proc[j].arrivalTime <= proc[pos].arrivalTime) 
+    //             pos = j;
+    //     }
+
+    //     temp = proc[i].arrivalTime;
+    //     proc[i].arrivalTime = proc[pos].arrivalTime;
+    //     proc[pos].arrivalTime = temp;
+  
+    //     temp = proc[i].burstTime;
+    //     proc[i].burstTime = proc[pos].burstTime;
+    //     proc[pos].burstTime = temp;
+  
+    //     temp = proc[i].process;
+    //     proc[i].process = proc[pos].process;
+    //     proc[pos].process = temp;
+    // }
+
+    printf("%d\n", n);
     while (clear != 1) {
-        for (i=0; i<n; i++) {
-            if (arrivalTimes[i] <= count) {
-                for (j=0; j<fill; j++) {
-                    if (index[j] == i) {
-                        in = 1;
+        do {
+            for (i=0; i<n; i++) {
+                printf("first loop i: %d\n", i);
+                printf("qcount: %d\n", qcount);
+                printf("count: %d\n", count);
+                printf("arrival time: %d\n", arrivalTimes[i]);
+                if (arrivalTimes[i] <= count) {
+                    if (fill != 0) {
+                        for (j=0; j<fill; j++) {
+                            if (index[j] == i) {
+                                in = 1;
+                                break;
+                            }
+                        }
+                    }
+                    if (in == 0) {
+                        index[fill] = i;
+                        fill++;
+                    }
+                    in = 0;
+                    if (proc[index[i]].burstTime != 0) {
+                        queue[qcount] = i;
+                        qcount++;
+                    }
+                }
+            }
+
+            if (fincount != n && fill != 0) {
+                for (i=0; i<fill; i++) {
+                    if (proc[index[i]].burstTime == 0) {
+                        inc = 1;
+                    }
+                    else {
+                        inc = 0;
                         break;
                     }
                 }
-                if (in == 0) {
-                    index[fill] = i;
-                    fill++;
-                }
-                in = 0;
-                if (proc[index[i]].burstTime != 0) {
-                    queue[qcount] = i;
-                    qcount++;
-                }
             }
-        }
+            printf("inc: %d\n", inc);
+            if (inc == 1)
+                count++;
+        } while(inc == 1);
 
-        for (i=0; i<qcount; i++) {
+        for (i=qpointer; i<qcount; i++) {
+            printf("second loop i: %d\n", i);
             if (proc[queue[i]].burstTime >= quant) {
                 proc[queue[i]].startTime[proc[queue[i]].counter] = count;
                 proc[queue[i]].burstTime -= quant;
@@ -74,6 +119,7 @@ int rrWaitingTime(int processes[], int n, int burstTimes[], int arrivalTimes[], 
                         }
                         if (in == 0) {
                             index[fill] = j;
+                            proc[index[fill]].waitTime += count - arrivalTimes[j];
                             fill++;
                         }
                         in = 0;
@@ -118,6 +164,7 @@ int rrWaitingTime(int processes[], int n, int burstTimes[], int arrivalTimes[], 
                         }
                         if (in == 0) {
                             index[fill] = j;
+                            proc[index[fill]].waitTime += count - arrivalTimes[j];
                             fill++;
                         }
                         in = 0;
@@ -138,7 +185,8 @@ int rrWaitingTime(int processes[], int n, int burstTimes[], int arrivalTimes[], 
                 }
             }
         }
-        if (fincount != n) {
+        qpointer = i;
+        if (fincount != n && fill != 0) {
             for (i=0; i<fill; i++) {
                 if (proc[index[i]].burstTime == 0) {
                     inc = 1;
@@ -152,8 +200,9 @@ int rrWaitingTime(int processes[], int n, int burstTimes[], int arrivalTimes[], 
 
         if (inc == 1)
             count++;
-
-        if (fill == fincount) {
+        printf("n: %d\n", n);
+        printf("fincount: %d\n", fincount);
+        if (n == fincount) {
             clear = 1;
         }
         else clear = 0;
