@@ -16,7 +16,7 @@ struct ProcRR {
 int rrWaitingTime(int n, int quant, struct ProcRR proc[]) {
    int i, j, k;
    int queue[2000], qcount = 1, qpointer = 0, qin = 0;
-   int clear = 0, pass = 0, ctr = 0, temp, newcount = 0;
+   int clear = 0, pass = 0, ctr = 0, temp, newcount = 0, lastIndexProcessed;
    int cpu = proc[0].arrivalTime;
 
 //    queue[0] = 0;
@@ -57,10 +57,22 @@ int rrWaitingTime(int n, int quant, struct ProcRR proc[]) {
                     proc[j].adjust = 1;
                 }
                 qcount++;
+                // printf("last index processed: %d\n", lastIndexProcessed);
+                if (queue[0] == lastIndexProcessed) {
+                    temp = queue[qcount];
+                    queue[qcount] = queue[0];
+                    queue[0] = temp;
+                    for (k = 0; k > qcount - 1; k++) {
+                        temp = queue[k];
+                        queue[k] = queue[k+1];
+                        queue[k+1] = temp;
+                    }
+                }
+                
             }
-            printf("Q[%d]: %d\n", j, queue[j]);
+            // printf("Q[%d]: %d\n", j, queue[j]);
         }
-        printf("\n");
+        // printf("\n");
 
         if (pass == 1) {
             for (i=0; i<qcount; i++) {
@@ -122,11 +134,12 @@ int rrWaitingTime(int n, int quant, struct ProcRR proc[]) {
                 
 
             }
+            lastIndexProcessed = queue[qcount - 1];
             // qpointer = i;
             // printf("2 qptr %d\n", qpointer);
             // printf("HELLO ");
         }
-
+        printf("\n");
        for (i = 0; i < n; i++) {
         //    printf("bt %d: %d ", i, proc[i].burstTime);
             if (proc[i].burstTime == 0) {
@@ -184,9 +197,9 @@ int rrGetAvgTime(int processes[], int n, int arrivalTimes[], int burstTimes[], i
     //     proc[pos] = temp;
     // }
 
-    for (i = 0; i < n; i++) {
-        printf("P[%d] | Burst Time: %d | Arrival Time: %d\n", proc[i].process, proc[i].burstTime, proc[i].arrivalTime);
-    }
+    // for (i = 0; i < n; i++) {
+    //     printf("P[%d] | Burst Time: %d | Arrival Time: %d\n", proc[i].process, proc[i].burstTime, proc[i].arrivalTime);
+    // }
     
 
     rrWaitingTime(n, quant, proc);
