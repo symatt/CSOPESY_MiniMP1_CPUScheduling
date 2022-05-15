@@ -12,6 +12,8 @@ int procTime(int proc[], int n, int arrival_time[], int burst_time[], int wait_t
                 pass = 1;
                 break;
             }
+            else
+                pass = 0;
         }
 
         if (pass == 0) {
@@ -78,6 +80,18 @@ int fcfsGetAvgTime(int proc[], int n, int arrivalTime[], int burst_time[]) {
                 temp = burst_time[i];
                 burst_time[i] = burst_time[j];
                 burst_time[j] = temp;
+
+                temp = wait_time[i];
+                wait_time[i] = wait_time[j];
+                wait_time[j] = temp;
+
+                temp = start_time[i];
+                start_time[i] = start_time[j];
+                start_time[j] = temp;
+
+                temp = end_time[i];
+                end_time[i] = end_time[j];
+                end_time[j] = temp;
             }
         }
     }
