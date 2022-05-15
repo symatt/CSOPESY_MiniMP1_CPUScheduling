@@ -16,10 +16,10 @@ struct ProcRR {
 int rrWaitingTime(int n, int quant, struct ProcRR proc[]) {
    int i, j, k;
    int queue[2000], qcount = 1, qpointer = 0, qin = 0;
-   int clear = 0, pass = 0;
+   int clear = 0, pass = 0, ctr = 0, temp, newcount = 0;
    int cpu = proc[0].arrivalTime;
 
-   queue[0] = 0;
+//    queue[0] = 0;
    proc[0].adjust = 1;
 
    do {
@@ -35,12 +35,37 @@ int rrWaitingTime(int n, int quant, struct ProcRR proc[]) {
         if (pass == 0) 
             cpu++;
 
+        // add to queue
+        qcount = 0;
+        newcount = 0;
+        for (j = 0; j < n; j++) {
+            if(proc[j].arrivalTime <= cpu && proc[j].burstTime != 0) {
+                queue[qcount] = j;
+                
+                if (proc[j].adjust == 0) {
+                    temp = queue[qcount];
+                    queue[qcount] = queue[newcount];
+                    queue[newcount] = temp;
+
+                    for (k = qcount; k > newcount + 1; k--) {
+                        temp = queue[k];
+                        queue[k] = queue[k-1];
+                        queue[k - 1] = temp;
+                    }
+                    newcount++;
+                    proc[j].waitTime += cpu - proc[j].arrivalTime;
+                    proc[j].adjust = 1;
+                }
+                qcount++;
+            }
+        }
+
         if (pass == 1) {
-            for (i=qpointer; i<qcount; i++) {
+            for (i=0; i<qcount; i++) {
                 proc[queue[i]].startTime[proc[queue[i]].counter] = cpu;
                 
                 if (proc[queue[i]].burstTime >= quant) {
-                    for (j=i; j<qcount; j++) {
+                    for (j=0; j<qcount; j++) {
                         if (proc[i].process != proc[j].process)
                             proc[queue[j]].waitTime += quant;
                     }
@@ -49,7 +74,7 @@ int rrWaitingTime(int n, int quant, struct ProcRR proc[]) {
                     proc[queue[i]].burstTime -= quant;
                 }
                 else   {
-                    for (j=i; j<qcount; j++) {
+                    for (j=0; j<qcount; j++) {
                         if (proc[i].process != proc[j].process)
                             proc[queue[j]].waitTime += proc[queue[i]].burstTime;
                     }
@@ -59,30 +84,48 @@ int rrWaitingTime(int n, int quant, struct ProcRR proc[]) {
                 }
                 (proc[queue[i]].counter)++;
 
-                // add to queue
-                for (j=0; j<n; j++) {
-                    if (proc[j].arrivalTime <= cpu && proc[j].burstTime != 0) {
-                        if (proc[i].process != proc[j].process && proc[j].adjust == 0) {
-                            queue[qcount] = j;
-                            qcount++;
+                // // add to queue
+                // for (j=0; j<n; j++) {
+                //     printf("j: %d ", j);
+                //     printf("j arrival: %d ", proc[j].arrivalTime);
+                //     printf("j burst: %d ", proc[j].burstTime);
+                //     printf("cpu: %d ", cpu);
+                //     if (proc[j].arrivalTime <= cpu && proc[j].burstTime != 0) {
+                //         // if (proc[i].process != proc[j].process) {
+                //             queue[qcount] = j;
+                //             qcount++;
+                //             if (proc[j].adjust == 0) {
+                //                 proc[j].waitTime += cpu - proc[j].arrivalTime;
+                //                 proc[j].adjust = 1;
+                //             }
+                //         // }
+                //         // else {
+                //         //     if (proc[j].burstTime != 0) {
+                //         //         printf("HELLO ");
+                //         //         queue[qcount] = j;
+                //         //         qcount++;
+                //         //     }
+                //         // }
+                //     }
+                //     // printf("queue %d ", queue[j]);
+                    
+                //     // printf("qptr %d ", qpointer);
+                // }
 
-                            proc[j].waitTime += cpu - proc[j].arrivalTime;
-                            proc[j].adjust = 1;
-                        }
-                        else {
-                            if (proc[j].burstTime != 0) {
-                                queue[qcount] = j;
-                                qcount++;
-                            }
-                        }
-                    }
-                }
+                // for (k = 0; k < qcount; k++) printf("\nqueue index : %d\n", queue[k]);
+                // printf("1 qptr %d ", qpointer);
+                // printf("\n");
+
+                
+
             }
-
-            qpointer = i;
+            // qpointer = i;
+            // printf("2 qptr %d\n", qpointer);
+            // printf("HELLO ");
         }
 
        for (i = 0; i < n; i++) {
+        //    printf("bt %d: %d ", i, proc[i].burstTime);
             if (proc[i].burstTime == 0) {
                 clear = 1;
             }
@@ -119,7 +162,7 @@ int rrGetAvgTime(int processes[], int n, int arrivalTimes[], int burstTimes[], i
     // sort by arrival time
     for (i=0; i<n; i++) {
         for (j=0; j<n; j++) {
-            if (proc[j].arrivalTime > proc[i].arrivalTime) {
+            if (proc[j].arrivalTime >= proc[i].arrivalTime) {
                 temp = proc[i];
                 proc[i] = proc[j];
                 proc[j] = temp;  
