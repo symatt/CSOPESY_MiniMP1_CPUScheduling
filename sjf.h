@@ -1,17 +1,29 @@
 // Shortest Job First CPU Scheduling Algorithm
 #include<stdio.h>
+
+struct ProcessInfoSJF {
+    int startTime;
+    int endTime;
+};
+
 int sjfGetAvgTime(int processes[], int processSize, int arrivalTimes[], int burstTimes[]) {
-    int waitTimes[processSize], i, j, total = 0, pos, temp;
+    int waitTimes[processSize], i, j, total = 0, pos, temp, totalCPUTime = 0, currCPUTime = 0;
+    struct ProcessInfoSJF info[processSize];
     float avg_wt;
-  
-   //sorting of burst times
+    
+   //sorting of arrival times
     for (i = 0; i < processSize; i++) {
         pos = i;
         for (j = i + 1; j < processSize; j++) {
-            if (burstTimes[j] < burstTimes[pos]) 
+            if (arrivalTimes[j] < arrivalTimes[pos]) 
                 pos = j;
+            else if (arrivalTimes[j] == arrivalTimes[pos]) {
+                if (burstTimes[j] < burstTimes[pos]) {
+                    pos = j;
+                }
+            }
         }
-  
+        // printf("\n");
         temp = burstTimes[i];
         burstTimes[i] = burstTimes[pos];
         burstTimes[pos] = temp;
@@ -19,22 +31,104 @@ int sjfGetAvgTime(int processes[], int processSize, int arrivalTimes[], int burs
         temp = processes[i];
         processes[i] = processes[pos];
         processes[pos] = temp;
+
+        temp = arrivalTimes[i];
+        arrivalTimes[i] = arrivalTimes[pos];
+        arrivalTimes[pos] = temp;
+
+        info[i].startTime = 0;
+        info[i].endTime = 0;
     }
-   
-    waitTimes[0] = 0;            
-  
+
+    //sorting of arrival times
+    currCPUTime = burstTimes[0];
     for (i = 1; i < processSize; i++) {
-        waitTimes[i] = 0;
-        for (j = 0; j < i; j++)
-            waitTimes[i] += burstTimes[j];
+        pos = i;
+        for (j = i + 1; j < processSize; j++) {
+            // printf("curr CPU time : %d\n", currCPUTime);
+            if (arrivalTimes[j] < arrivalTimes[pos]) 
+                pos = j;
+            else if (arrivalTimes[j] == arrivalTimes[pos]) {
+                if (burstTimes[j] < burstTimes[pos]) {
+                    pos = j;
+                }
+            }
+
+            
+            if (arrivalTimes[j] <= currCPUTime && burstTimes[j] < burstTimes[i]) {
+                pos = j;
+            }
+        }
+        // printf("\n");
+        temp = burstTimes[i];
+        burstTimes[i] = burstTimes[pos];
+        burstTimes[pos] = temp;
   
+        temp = processes[i];
+        processes[i] = processes[pos];
+        processes[pos] = temp;
+
+        temp = arrivalTimes[i];
+        arrivalTimes[i] = arrivalTimes[pos];
+        arrivalTimes[pos] = temp;
+
+        info[i].startTime = 0;
+        info[i].endTime = 0;
+
+        currCPUTime += burstTimes[i];
+    }
+
+    // for (i = 0; i < processSize; i++) {
+    //     printf("P[%d] | Burst Time: %d | Arrival Time: %d\n", processes[i], burstTimes[i], arrivalTimes[i]);
+    // }
+    
+    waitTimes[0] = 0;     
+    info[0].startTime = arrivalTimes[0];       
+    info[0].endTime = arrivalTimes[0] + burstTimes[0];
+
+    for (i = 1; i < processSize; i++) {
+
+        waitTimes[i] = 0;
+        
+        for (j = i - 1; j < i; j++){
+            waitTimes[i] += info[j].endTime - arrivalTimes[i];
+            // printf("1 P[%d] wait time: %d\n", i+1, waitTimes[i]);
+        }
+        if (arrivalTimes[i] <= info[i - 1].endTime) {
+            info[i].startTime = info[i - 1].endTime;
+        }
+        else {
+            info[i].startTime = arrivalTimes[i];
+            waitTimes[i] = 0;
+        }
+        info[i].endTime = info[i].startTime + burstTimes[i];
         total += waitTimes[i];
     }
   
+    struct ProcessInfoSJF tempInfo;
+     // sort by process id
     for (i = 0; i < processSize; i++) {
-        int startTime = arrivalTimes[i] + waitTimes[i];
-        int endTime = startTime + burstTimes[i];
-        printf("P[%d] Start Time: %d End Time: %d | Waiting Time: %d\n", processes[i], startTime, endTime, waitTimes[i]);
+        pos = i;
+        for (j = i + 1; j < processSize; j++) {
+            if (processes[j] <= processes[pos]) 
+                pos = j;
+        }
+
+        temp = processes[i];
+        processes[i] = processes[pos];
+        processes[pos] = temp;
+  
+        temp = waitTimes[i];
+        waitTimes[i] = waitTimes[pos];
+        waitTimes[pos] = temp;
+
+        tempInfo = info[i];
+        info[i] = info[pos];
+        info[pos] = tempInfo;
+    }
+
+    for (i = 0; i < processSize; i++) {
+        printf("P[%d] Start Time: %d End Time: %d | Waiting Time: %d\n", processes[i], info[i].startTime, info[i].endTime, waitTimes[i]);
     }
 
     avg_wt = (float)total / processSize; 

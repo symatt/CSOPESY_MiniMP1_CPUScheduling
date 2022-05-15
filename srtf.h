@@ -2,16 +2,16 @@
 
 #include<stdio.h>
 
-struct ProcessInfo {
+struct ProcessInfoSRTF {
     int ctr;
     int startTimes[100];
     int endTimes[100];
 };
 
 int srtfGetAvgTime(int processes[], int processSize, int arrivalTimes[], int burstTimes[]) {
-    int remainingTimes[processSize], startTime, endTime, i, j, pos, smallest, temp;
+    int remainingTimes[processSize], waitTimes[processSize], startTime, endTime, i, j, pos, smallest, temp;
     int remain = 0, n, time, sum_wait = 0, sum_turnaround = 0;
-    struct ProcessInfo info[processSize];
+    struct ProcessInfoSRTF info[processSize];
 
     // sort by arrival time and initialize the processInfo struct for multiple start and end times per process
     for (i = 0; i < processSize; i++) {
@@ -34,6 +34,7 @@ int srtfGetAvgTime(int processes[], int processSize, int arrivalTimes[], int bur
         processes[pos] = temp;
 
         remainingTimes[i] = burstTimes[i];
+        waitTimes[i] = 0;
 
         info[i].ctr = 0;
         for (j = 0; j < 100; j++) {
@@ -55,8 +56,8 @@ int srtfGetAvgTime(int processes[], int processSize, int arrivalTimes[], int bur
     // start from time = 0
     for(time = 0; remain != processSize; time++) {
         // printf("CURRENT TIME : %d\n", time);
-        // compare if the smallest remaining time process is still the smallest
         // printf("Current smallest: P[%d] burst time: %d arrival time: %d remaining time: %d\n", processes[smallest], burstTimes[smallest], arrivalTimes[smallest], remainingTimes[smallest]);
+        // compare if the smallest remaining time process is still the smallest
         for(i = 0; i < processSize; i++) {
             // if not the smallest, make the end time to be the current time and 
             // check if the start != end time ( this means that there are a preemption )
@@ -71,6 +72,7 @@ int srtfGetAvgTime(int processes[], int processSize, int arrivalTimes[], int bur
                 if (startTime != endTime) {
                     info[smallest].startTimes[info[smallest].ctr] = startTime;
                     info[smallest].endTimes[info[smallest].ctr] = endTime;
+                    info[smallest].ctr += 1;
                     // printf("P[%d] Start Time: %d End Time: %d | Waiting Time: %d\n", smallest + 1, startTime, endTime, endTime-burstTimes[smallest]-arrivalTimes[smallest]);
                     startTime = endTime;
                 }
@@ -80,7 +82,8 @@ int srtfGetAvgTime(int processes[], int processSize, int arrivalTimes[], int bur
         }
         // printf("\n");
         
-        
+        // if the arrival time of the current smallest is smaller or equal to the current CPU time, subtract 1 from its remaining time
+        // else incremenent the start time ( this means that there was an idle CPU time )
         if (arrivalTimes[smallest] <= time) {
             remainingTimes[smallest]--;
         }
@@ -94,16 +97,20 @@ int srtfGetAvgTime(int processes[], int processSize, int arrivalTimes[], int bur
         if(remainingTimes[smallest] == 0) {
             remain++;
             endTime = time + 1;
-            printf("\nP[%d] ", processes[smallest]);
-            for (i = 0; i < 20; i++) {
-                if (info[smallest].startTimes[i] == -1 && info[smallest].endTimes[i] == -1) {
-                    break;
-                }
-                printf("Start Time: %d End Time: %d | ", info[smallest].startTimes[i], info[smallest].endTimes[i]);
-            }
-            printf("Start Time: %d End Time: %d ", startTime, endTime);
-            printf("| Waiting Time: %d\n", endTime-burstTimes[smallest]-arrivalTimes[smallest]);
-            sum_wait += (endTime - burstTimes[smallest] - arrivalTimes[smallest]);
+            // printf("\nP[%d] ", processes[smallest]);
+            info[smallest].startTimes[info[smallest].ctr] = startTime;
+            info[smallest].endTimes[info[smallest].ctr] = endTime;
+
+            // for (i = 0; i < 20; i++) {
+            //     if (info[smallest].startTimes[i] == -1 && info[smallest].endTimes[i] == -1) {
+            //         break;
+            //     }
+            //     printf("Start Time: %d End Time: %d | ", info[smallest].startTimes[i], info[smallest].endTimes[i]);
+            // }
+            // printf("Start Time: %d End Time: %d ", startTime, endTime);
+            waitTimes[smallest] = endTime-burstTimes[smallest]-arrivalTimes[smallest];
+            // printf("| Waiting Time: %d\n", waitTimes[smallest]);
+            sum_wait += waitTimes[smallest];
             
             // make the remaining time a large number to not intefere with the remaining times
             remainingTimes[smallest] = 99999;
@@ -112,8 +119,40 @@ int srtfGetAvgTime(int processes[], int processSize, int arrivalTimes[], int bur
         }
     }
 
-    printf("\n\nAverage waiting time = %.1f\n", (float)sum_wait / processSize);
+    struct ProcessInfoSRTF tempInfo;
+     // sort by process id
+    for (i = 0; i < processSize; i++) {
+        pos = i;
+        for (j = i + 1; j < processSize; j++) {
+            if (processes[j] <= processes[pos]) 
+                pos = j;
+        }
 
+        temp = processes[i];
+        processes[i] = processes[pos];
+        processes[pos] = temp;
+  
+        temp = waitTimes[i];
+        waitTimes[i] = waitTimes[pos];
+        waitTimes[pos] = temp;
+
+        tempInfo = info[i];
+        info[i] = info[pos];
+        info[pos] = tempInfo;
+    }
+
+    for (i = 0; i < processSize; i++) {
+        printf("P[%d] ", processes[i]);
+        for (j = 0; j < 20; j++) {
+                if (info[i].startTimes[j] == -1 && info[i].endTimes[j] == -1) {
+                    break;
+                }
+                printf("Start Time: %d End Time: %d | ", info[i].startTimes[j], info[i].endTimes[j]);
+        }
+        printf("| Waiting Time: %d\n", waitTimes[i]);
+    }
+    
+    printf("\nAverage waiting time = %.1f\n", (float)sum_wait / processSize);
 
     return 0;
 }
