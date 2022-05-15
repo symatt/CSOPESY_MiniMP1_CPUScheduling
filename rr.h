@@ -76,7 +76,7 @@ int rrWaitingTime(int n, int quant, struct ProcRR proc[]) {
 
         if (pass == 1) {
             for (i=0; i<qcount; i++) {
-                printf("P[%d]: %d\n", i, proc[queue[i]].process);
+                // printf("P[%d]: %d\n", i, proc[queue[i]].process);
                 proc[queue[i]].startTime[proc[queue[i]].counter] = cpu;
                 
                 if (proc[queue[i]].burstTime >= quant) {
@@ -139,7 +139,7 @@ int rrWaitingTime(int n, int quant, struct ProcRR proc[]) {
             // printf("2 qptr %d\n", qpointer);
             // printf("HELLO ");
         }
-        printf("\n");
+        // printf("\n");
        for (i = 0; i < n; i++) {
         //    printf("bt %d: %d ", i, proc[i].burstTime);
             if (proc[i].burstTime == 0) {
