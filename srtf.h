@@ -43,9 +43,9 @@ int srtfGetAvgTime(int processes[], int processSize, int arrivalTimes[], int bur
         }
     }
 
-    for (i = 0; i < processSize; i++) {
-        printf("P[%d] | Burst Time: %d | Arrival Time: %d\n", processes[i], burstTimes[i], arrivalTimes[i]);
-    }
+    // for (i = 0; i < processSize; i++) {
+    //     printf("P[%d] | Burst Time: %d | Arrival Time: %d\n", processes[i], burstTimes[i], arrivalTimes[i]);
+    // }
     
     // initialize the smallest value as the first process that arrived
     smallest = 0;
