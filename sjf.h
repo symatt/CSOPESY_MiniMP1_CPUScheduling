@@ -40,9 +40,14 @@ int sjfGetAvgTime(int processes[], int processSize, int arrivalTimes[], int burs
         info[i].endTime = 0;
     }
 
-    //sorting of arrival times
+    // for (i = 0; i < processSize; i++) {
+    //     printf("P[%d] | Burst Time: %d | Arrival Time: %d\n", processes[i], burstTimes[i], arrivalTimes[i]);
+    // }
+
+    //sorting of arrival times, check id if they should go first
     currCPUTime = burstTimes[0];
     for (i = 1; i < processSize; i++) {
+        // printf("currCPUTime : %d\n", currCPUTime);
         pos = i;
         for (j = i + 1; j < processSize; j++) {
             // printf("curr CPU time : %d\n", currCPUTime);
@@ -55,7 +60,7 @@ int sjfGetAvgTime(int processes[], int processSize, int arrivalTimes[], int burs
             }
 
             
-            if (arrivalTimes[j] <= currCPUTime && burstTimes[j] < burstTimes[i]) {
+            if (arrivalTimes[j] <= currCPUTime && burstTimes[j] < burstTimes[pos]) {
                 pos = j;
             }
         }
@@ -82,6 +87,7 @@ int sjfGetAvgTime(int processes[], int processSize, int arrivalTimes[], int burs
     //     printf("P[%d] | Burst Time: %d | Arrival Time: %d\n", processes[i], burstTimes[i], arrivalTimes[i]);
     // }
     
+    // initialize waitTime, startTime and endTime of first process
     waitTimes[0] = 0;     
     info[0].startTime = arrivalTimes[0];       
     info[0].endTime = arrivalTimes[0] + burstTimes[0];
@@ -90,10 +96,13 @@ int sjfGetAvgTime(int processes[], int processSize, int arrivalTimes[], int burs
 
         waitTimes[i] = 0;
         
-        for (j = i - 1; j < i; j++){
+        // current wait time of process will be the sum of all the end times - the arrival time of the process
+        for (j = i - 1; j < i; j++) {
             waitTimes[i] += info[j].endTime - arrivalTimes[i];
             // printf("1 P[%d] wait time: %d\n", i+1, waitTimes[i]);
         }
+        // if the process arrived before or at endtime of previous, the start is equal to end of previous
+        // else start time will be when the process arrived.
         if (arrivalTimes[i] <= info[i - 1].endTime) {
             info[i].startTime = info[i - 1].endTime;
         }
@@ -101,6 +110,7 @@ int sjfGetAvgTime(int processes[], int processSize, int arrivalTimes[], int burs
             info[i].startTime = arrivalTimes[i];
             waitTimes[i] = 0;
         }
+        // end time of process will be start time + burst
         info[i].endTime = info[i].startTime + burstTimes[i];
         total += waitTimes[i];
     }

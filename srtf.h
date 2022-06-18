@@ -60,7 +60,7 @@ int srtfGetAvgTime(int processes[], int processSize, int arrivalTimes[], int bur
         // compare if the smallest remaining time process is still the smallest
         for(i = 0; i < processSize; i++) {
             // if not the smallest, make the end time to be the current time and 
-            // check if the start != end time ( this means that there are a preemption )
+            // check if the start != end time ( this means that there is a preemption )
             // make the new start time the current end time
             // make the current index the new smallest remaning time process
             if(arrivalTimes[i] <= time && 
